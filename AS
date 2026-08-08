@@ -1,0 +1,94 @@
+-- โหลด Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- สร้างหน้าต่าง UI หลัก
+local Window = Rayfield:CreateWindow({
+   Name = "Auto Farm & Sell Hub",
+   LoadingTitle = "Loading Script...",
+   LoadingSubtitle = "by Assistant",
+   ConfigurationSaving = {
+      Enabled = false
+   },
+   Discord = {
+      Enabled = false
+   },
+   KeySystem = false
+})
+
+-- สร้าง Tab หลัก
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+---------------------------------------------------------
+-- 1. ฟังก์ชัน Auto Collect Gem Orbs
+---------------------------------------------------------
+local autoCollect = false
+
+MainTab:CreateToggle({
+   Name = "Auto Collect Gem Orbs",
+   CurrentValue = false,
+   Flag = "AutoCollectGemToggle",
+   Callback = function(Value)
+      autoCollect = Value
+      
+      if Value then
+         task.spawn(function()
+            while autoCollect do
+               local rEvents = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents")
+               if rEvents then
+                  local orbEvent = rEvents:FindFirstChild("orbEvent")
+                  if orbEvent then
+                     local args = {
+                         "collectOrb",
+                         "Gem",
+                         "City"
+                     }
+                     orbEvent:FireServer(unpack(args))
+                  end
+               end
+               
+               task.wait(0.1) -- ความเร็วในการเก็บ (ปรับลดได้ เช่น 0.05)
+            end
+         end)
+      end
+   end,
+})
+
+---------------------------------------------------------
+-- 2. ฟังก์ชัน Auto Sell All
+---------------------------------------------------------
+local autoSell = false
+
+MainTab:CreateToggle({
+   Name = "Auto Sell All",
+   CurrentValue = false,
+   Flag = "AutoSellToggle",
+   Callback = function(Value)
+      autoSell = Value
+      
+      if Value then
+         task.spawn(function()
+            while autoSell do
+               local sellEvent = game:GetService("ReplicatedStorage"):FindFirstChild("SellEvent")
+               if sellEvent then
+                  local args = {
+                      "SellAll"
+                  }
+                  sellEvent:FireServer(unpack(args))
+               end
+               
+               task.wait(1) -- เวลาหน่วงในการขาย (วินาที)
+            end
+         end)
+      end
+   end,
+})
+
+---------------------------------------------------------
+-- แจ้งเตือนเมื่อโหลดสคริปต์เสร็จ
+---------------------------------------------------------
+Rayfield:Notify({
+   Title = "Script Loaded!",
+   Content = "รวมฟังก์ชันเปิด-ปิด เรียบร้อยแล้วครับ!",
+   Duration = 4,
+   Image = 4483362458,
+})
